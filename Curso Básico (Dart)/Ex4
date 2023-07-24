@@ -8,9 +8,12 @@ void main(){
   String ehNovato = 'Novato';
   print('Experiência: $ehNovato');
   
-  String peso = '80 kg';
-  String pesoBalanca = '80';//Criando a variável
+  String peso = '70 kg';
+  String pesoBalanca = '70';//Criando a variável
   int pesoAtual = int.parse(pesoBalanca.toString());
+  print('Variável pesoAtual: $pesoAtual');
+  print('Vaor absoluto: ${pesoAtual.abs()}');//valor absoluto
+  print('Arredondando: ${pesoAtual+1}');//Arredondando
   print('Peso: $peso');
   
   var notas = [7,8,9,10];
