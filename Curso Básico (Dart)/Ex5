@@ -8,8 +8,13 @@ void main(){
   String ehNovato = 'Novato';
   print('Experiência: $ehNovato');
   
-  String peso = '80 kg';
-  print('Peso: $peso');
+  double peso = 80;
+  final Map<String, double> pesos = {nome:peso,'Carol':58,'Daniel':78};
+  //double pesoNovo = pesos['Daniel'];
+  //print('Peso novo: $pesoNovo');
+  pesos.remove('Carol');//removendo a Carol
+  print('O mapa contém o primeiro nome? ${pesos.containsKey(nome)}');
+  print('Peso: $pesos');
   
   var notas = [7,8,9,10];
   
