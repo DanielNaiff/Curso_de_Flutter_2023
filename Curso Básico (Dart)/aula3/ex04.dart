@@ -1,12 +1,18 @@
 import 'dart:io';
 void main() {
   List <double> listadeNotas = [];
-  for(int i = 0; i < 4; i++ ){
-    print('Digite a nota${i+1} do aluno:');
+  double nota = 0;
+  int i = 0;
+  while(true){
+    print('Digite a nota${i+1} do aluno(Digite -1 caso queira parar):');
+    i += 1;
     double nota = double.parse(stdin.readLineSync()!);
+    if (nota == -1){
+      break;
+    }
     listadeNotas.add(nota);
   }
-  print(listadeNotas);
+  calculaMedia(listadeNotas);
 }
 
 void calculaMedia(List <double> lista){
@@ -16,5 +22,5 @@ void calculaMedia(List <double> lista){
     soma += lista[i];
   }
   media = soma/lista.length;
-  print(media);
+  print('A média das notas é:${media}');
 }
