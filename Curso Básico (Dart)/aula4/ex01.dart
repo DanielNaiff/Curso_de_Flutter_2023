@@ -9,6 +9,7 @@ void main() {
   camaro.acelerar();
   camaro.frear();
   camaro.fecharPorta();
+  camaro.abrirPorta();
 }
 class Carro {
   String modelo;
@@ -38,7 +39,7 @@ class Carro {
   }
 
   void abrirPorta(){
-    print('Porta aberta');
+    print('Abrindo porta');
   }
 
   void fecharPorta(){
