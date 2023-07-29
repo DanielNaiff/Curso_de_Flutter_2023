@@ -29,7 +29,7 @@ class Dog extends Animal{
 }
 
 class Cat extends Animal{
-  Cat(som): super(som);
+  Cat(String som): super(som);
   
   @override
    void emitSound(){
