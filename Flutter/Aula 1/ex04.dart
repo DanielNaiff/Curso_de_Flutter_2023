@@ -18,7 +18,7 @@ void main() {
       'Canapés de salmão com cream cheese',
     ],
   };
-  int? categoria = null;
+  int? categoria = 2;
   runApp(MyApp(dados: dados, categoria: categoria));
  
 }
