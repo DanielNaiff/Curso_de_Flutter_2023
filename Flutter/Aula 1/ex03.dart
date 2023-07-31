@@ -1,77 +1,52 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MainApp());
-}
-
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-      final Map<String, List<String>> dados = {
+  final Map<String, List<String>> dados = {
     'Sobremesas': [
       'Torta de Maça',
       'Mousse de chocolate',
       'Pudim de leite condensado',
     ],
-    
+    'Pratos principais': [
+      'Frango assado com batatas',
+      'Espaguete à bolonhesa',
+      'Risoto de cogumelos',
+    ],
+    'Aperitivos': [
+      'Bolinhos de queijo',
+      'Brucheta de tomate e manjericão',
+      'Canapés de salmão com cream cheese',
+    ],
   };
+
+  runApp(MyApp(dados: dados));
+}
+
+class MyApp extends StatelessWidget {
+  final Map<String, List<String>> dados;
+
+  const MyApp({required this.dados});
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.blue,
-            title: Text('Minhas receitas'),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => null,
-            child: Text('OlÁ'),
-          ),
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Text(
-                  'Sobremesas',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Text('Torta de Maça'),
+        appBar: AppBar(
+          title: Text('Menu do Restaurante'),
+        ),
+        body: ListView.builder(
+          itemCount: dados.length,
+          itemBuilder: (context, index) {
+            final categoria = dados.keys.elementAt(index);
+            final items = dados[categoria]!;
 
-              Text('Mousse de chocolate'),
-
-              Text('Pudim de leite condensado\n'),
-
-              Center(
-                child: Text(
-                  'Pratos principais',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Text('Frango assado com batatas'),
-              Text('Espaguete á bolonhesa'),
-              Text('Risoto de cogumelos\n'),
-              
-              Center(
-                child: Text(
-                  'Aperitivos',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Text('Bolinhos de queijo'),
-              Text('Brucheta de tomate e manjericão'),
-              Text('Canapés de salmão com cream cheese\n'),
-            ],
-          )),
+            return ExpansionTile(
+              title: Text(categoria),
+              children: items.map((item) => ListTile(title: Text(item))).toList(),
+            );
+          },
+        ),
+      ),
     );
   }
 }
