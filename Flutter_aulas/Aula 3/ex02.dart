@@ -28,16 +28,16 @@ class _MainAppState extends State<MainApp> {
     ],
   };
 
-  String searchText = '';
-  List<String> searchResults = [];
+  String textoPesquisa = '';
+  List<String> resultadosPesquisa = [];
 
-  void searchInMap(String query) {
+  void pesquisarPratos(String query) {
     setState(() {
-      searchResults = dados.entries
+      resultadosPesquisa = dados.entries
           .where(
               (entry) => entry.key.toLowerCase().contains(query.toLowerCase()))
           .expand((entry) => entry.value.where(
-              (dish) => dish.toLowerCase().contains(query.toLowerCase())))
+              (prato) => prato.toLowerCase().contains(query.toLowerCase())))
           .toList();
     });
   }
@@ -56,27 +56,27 @@ class _MainAppState extends State<MainApp> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
-                onChanged: (value) {
-                  searchText = value.toLowerCase();
-                  searchInMap(searchText);
+                onChanged: (valor) {
+                  textoPesquisa = valor.toLowerCase();
+                  pesquisarPratos(textoPesquisa);
                 },
                 decoration: InputDecoration(
-                  labelText: 'Procure por um prato',
+                  labelText: 'Pesquisar por um prato de comida',
                 ),
               ),
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: searchResults.length,
+                itemCount: resultadosPesquisa.length,
                 itemBuilder: (context, index) {
-                  final dish = searchResults[index];
+                  final prato = resultadosPesquisa[index];
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      color: Colors.blueAccent, // You can change the color here
+                    child: Card(
+                      color: Colors.blueAccent,
                       child: ListTile(
                         title: Text(
-                          dish,
+                          prato,
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -103,7 +103,7 @@ class _MainAppState extends State<MainApp> {
                               ),
                             ),
                           ),
-                        Column(
+                        Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             for (String valor in entries[i].value)
@@ -111,8 +111,7 @@ class _MainAppState extends State<MainApp> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Container(
-                                    color: Colors
-                                        .greenAccent, // You can change the color here
+                                    color: Colors.greenAccent,
                                     child: Text(
                                       valor,
                                       style: const TextStyle(
