@@ -13,7 +13,7 @@ class Tela extends StatelessWidget{
     body: Column(
     children:[
       Cabecalho(),
-      Corpo(valor: 42),
+      Corpo(valor: 42, valorInicial : 3),
     ]),
   );
   }
@@ -37,7 +37,8 @@ class _EstadoCabecalho extends State<Cabecalho> {
  
 class Corpo extends StatefulWidget{
 final int valor;
-const Corpo({super.key, required this.valor});
+final int valorInicial;
+const Corpo({super.key, required this.valor,required this.valorInicial});
   
    @override
   State<Corpo> createState()=> _EstadoCorpo();
@@ -47,11 +48,19 @@ const Corpo({super.key, required this.valor});
 
 class _EstadoCorpo extends State <Corpo> {
   int count = 0;
+  late int valor;
+  
+@override
+  void initState(){
+    super.initState();
+    valor = widget.valorInicial;
+  }
     @override
   Widget build(BuildContext context){
     return Column(
     children: [
       Text('$count'),
+      Text('$valor'),
       TextButton(
       child: const Text('Adicionar'),
       onPressed:(){
