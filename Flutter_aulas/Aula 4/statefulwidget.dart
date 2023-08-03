@@ -27,7 +27,7 @@ State<Cabecalho> createState()=> _EstadoCabecalho();
   
 }
 
-class EstadoCabecalho extends State<Cabecalho> {
+class _EstadoCabecalho extends State<Cabecalho> {
     @override
   Widget build(BuildContext context){
     return const Text('Cabeçalho');
@@ -36,7 +36,7 @@ class EstadoCabecalho extends State<Cabecalho> {
 
  
 class Corpo extends StatefulWidget{
-  final int valor;
+final int valor;
 const Corpo({super.key, required this.valor});
   
    @override
@@ -45,10 +45,21 @@ const Corpo({super.key, required this.valor});
 }
 
 
-class EstadoCorpo extends State <Corpo> {
+class _EstadoCorpo extends State <Corpo> {
+  int count = 0;
     @override
   Widget build(BuildContext context){
-    return Text('Corpo: $valor');
+    return Column(
+    children: [
+      Text('$count'),
+      TextButton(
+      child: const Text('Adicionar'),
+      onPressed:(){
+        setState((){
+           count += 1;
+        });
+      })
+    ]);
   }
   
 }
