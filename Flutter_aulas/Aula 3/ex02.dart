@@ -21,11 +21,7 @@ class _MainAppState extends State<MainApp> {
       'Espagueti á bolonhesa',
       'Risoto de cogumelo'
     ],
-    'Aperitivos': [
-      'Bruscheta de tomate com manjericão',
-      'Bolinhos de queijo',
-      'Canapés de salmão com cream cheese'
-    ],
+    'Aperitivos': ['Pizza de calabresa', 'macarrão', 'Torta de maçã'],
   };
 
   String textoPesquisa = '';
@@ -54,7 +50,7 @@ class _MainAppState extends State<MainApp> {
         body: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(8.0),
               child: TextField(
                 onChanged: (valor) {
                   textoPesquisa = valor.toLowerCase();
@@ -73,11 +69,11 @@ class _MainAppState extends State<MainApp> {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Card(
-                      color: Colors.blueAccent,
+                      color: Colors.blue,
                       child: ListTile(
                         title: Text(
                           prato,
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                         ),
                       ),
                     ),
@@ -109,18 +105,20 @@ class _MainAppState extends State<MainApp> {
                             for (String valor in entries[i].value)
                               if (busca.isEmpty || valor.contains(busca))
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    color: Colors.greenAccent,
-                                    child: Text(
-                                      valor,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.white,
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(5))),
+                                      child: Text(
+                                        valor,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
+                                    )),
                           ],
                         ),
                       ],
