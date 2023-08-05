@@ -43,8 +43,8 @@ class _TelaState extends State<Tela> {
         nome: 'Aperitivos',
         pratos: [
           Prato(nome: 'Bolinhos de Queijo', preco: 40),
-          Prato(nome: 'Bruschetta de Tomate e Manjericão', preco: 80),
-          Prato(nome: 'Canapés de Salmão com Cream Cheese', preco: 90)
+          Prato(nome: 'Bruschetta de Tomate ', preco: 80),
+          Prato(nome: 'Canapés de Salmão ', preco: 90)
         ],
       ),
       Categoria(
@@ -60,7 +60,7 @@ class _TelaState extends State<Tela> {
         pratos: [
           Prato(nome: 'Smetana', preco: 70),
           Prato(nome: 'Frango à Kiev', preco: 80),
-          Prato(nome: 'Arenque sob casaco de pele', preco: 60)
+          Prato(nome: 'Arenque', preco: 60)
         ],
       ),
     ];

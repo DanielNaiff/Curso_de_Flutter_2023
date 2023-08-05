@@ -27,6 +27,8 @@ class Secao extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeigth = MediaQuery.of(context).size.height;
     return Column(
       children: [
         Center(
@@ -47,12 +49,17 @@ class Secao extends StatelessWidget {
                   horizontal: 10,
                 ),
                 child: Container(
+                  width: screenWidth / 5,
+                  height: screenHeigth / 15,
                   decoration: BoxDecoration(
                       color: Colors.red,
                       borderRadius: BorderRadius.all(Radius.circular(5))),
-                  child: CardPrato(
-                    prato: prato,
-                    icone: const Icon(Icons.restaurant),
+                  child: Expanded(
+                    flex: 2,
+                    child: CardPrato(
+                      prato: prato,
+                      icone: const Icon(Icons.restaurant),
+                    ),
                   ),
                 ),
               ),
@@ -93,7 +100,9 @@ class CardPrato extends StatelessWidget {
       child: Column(
         children: [
           icone,
-          Text(prato.nome),
+          Text(
+            prato.nome,
+          ),
         ],
       ),
     );
