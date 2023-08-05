@@ -15,6 +15,33 @@ class Prato {
   const Prato({required this.nome, required this.preco});
 }
 
+class Child extends StatelessWidget {
+  final CardPrato cardprato;
+  final bool alturaFixa;
+
+  const Child({
+    super.key,
+    required this.cardprato,
+    required this.alturaFixa,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.all(Radius.circular(5))),
+      margin: const EdgeInsets.symmetric(
+        horizontal: 10,
+      ),
+      width: size.width / 5,
+      height: alturaFixa ? (size.height / 15) : null,
+      child: cardprato,
+    );
+  }
+}
+
 class Secao extends StatelessWidget {
   final String titulo;
   final List<Prato> pratos;
@@ -27,8 +54,6 @@ class Secao extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeigth = MediaQuery.of(context).size.height;
     return Column(
       children: [
         Center(
@@ -41,29 +66,25 @@ class Secao extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        Row(
-          children: [
-            for (Prato prato in pratos)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
-                child: Container(
-                  width: screenWidth / 5,
-                  height: screenHeigth / 15,
-                  decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.all(Radius.circular(5))),
-                  child: Expanded(
-                    flex: 2,
-                    child: CardPrato(
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (Prato prato in pratos)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                  ),
+                  child: Child(
+                    alturaFixa: false,
+                    cardprato: CardPrato(
                       prato: prato,
                       icone: const Icon(Icons.restaurant),
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ],
     );
