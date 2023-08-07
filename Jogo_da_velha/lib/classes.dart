@@ -23,13 +23,15 @@ class _ColunaState extends State<Coluna> {
     ['', '', ''],
   ];
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    jogadordaVez = widget.jogador1;
-    super.initState();
-  }
+//  @override
+  // void initState() {
+// TODO: implement initState
+  //   jogadordaVez = widget.jogador1;
+  //   jogadordaVez = widget.jogador2;
+  //   super.initState();
+  // }
 
+  @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -77,8 +79,12 @@ class _ColunaState extends State<Coluna> {
             ),
             Column(
               children: [
-                if (ganhador == true)
-                  Text('Vencedor: $vencedor',
+                if (ganhador == true && jogadorAtual == 'X')
+                  Text('Vencedor: ${widget.jogador2}',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold)),
+                if (ganhador == true && jogadorAtual == 'O')
+                  Text('Vencedor: ${widget.jogador1}',
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.bold)),
                 if (ganhador == true)
@@ -96,8 +102,12 @@ class _ColunaState extends State<Coluna> {
                             }));
                           },
                           child: const Text('Voltar'))),
-                if (ganhador == false)
-                  Text('Jogador da vez: $jogadordaVez',
+                if (ganhador == false && jogadorAtual == 'X')
+                  Text('Jogador da vez: ${widget.jogador1}',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold)),
+                if (ganhador == false && jogadorAtual == 'O')
+                  Text('Jogador da vez: ${widget.jogador2}',
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.bold)),
                 if (jogadas == 9 && ganhador == false)

@@ -1,4 +1,3 @@
-import 'package:calculadora_flutter/l%C3%B3gica.dart';
 import 'package:flutter/material.dart';
 //import 'package:calculadora_flutter/main.dart';
 import 'package:calculadora_flutter/classes.dart';
