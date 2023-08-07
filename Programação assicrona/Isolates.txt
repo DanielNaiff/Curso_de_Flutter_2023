@@ -1,0 +1,23 @@
+Isolates:
+Um Isolate é onde todo o código Dart é executado.É como um pequeno espaço na máquina com seu próprio pedaço privado de memória e um único thread executando
+um loop de eventos. Cada isolate tem sua própria memória e thread de execução.
+
+
+
+Futue => print(4) => uncompleted => then completed with data or completed with error
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+                                        
