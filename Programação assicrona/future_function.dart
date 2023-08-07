@@ -15,5 +15,5 @@ void main() {
 }
   Future<void> quatro() async{
     print(4);
-    Future.delayed(Duration(seconds: 10), () => print(4));
+    return Future.delayed(Duration(seconds: 10), () => print(4));
   }
