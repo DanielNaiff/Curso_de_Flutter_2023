@@ -66,14 +66,11 @@ class PedidoListView extends StatelessWidget {
             itemBuilder: (context, index) {
               Pedido pedido = pedidos![index];
               return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
+                  padding: const EdgeInsets.all(8.0),
                   child: ListTile(
                     title: Text(pedido.name),
                     subtitle: Text(pedido.email),
-                  ),
-                ),
-              );
+                  ));
             },
           );
         },
@@ -81,3 +78,4 @@ class PedidoListView extends StatelessWidget {
     );
   }
 }
+
