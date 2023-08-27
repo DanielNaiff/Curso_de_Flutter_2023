@@ -190,35 +190,33 @@ class _EstadoCorpoComCadastro extends State<_CorpoComCadastro> {
               },
             ),
           const SizedBox(height: 10),
-          SafeArea(
-            child: Center(
-              child: StreamBuilder<List<Projeto>>(
-                stream: _streamProjetos,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const LinearProgressIndicator();
-                  }
-                  List<Projeto> projetos = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: projetos.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(projetos[index].nome),
-                        // subtitle: Text(projetos[index].numeroMembros.toString()),
-                        trailing: Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.remove,
-                                  color: Colors.blueAccent),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+          Expanded(
+            child: StreamBuilder<List<Projeto>>(
+              stream: _streamProjetos,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const LinearProgressIndicator();
+                }
+                List<Projeto> projetos = snapshot.data!;
+                return ListView.builder(
+                  itemCount: projetos.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(projetos[index].nome),
+                      // subtitle: Text(projetos[index].numeroMembros.toString()),
+                      trailing: Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.remove,
+                                color: Colors.blueAccent),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],
