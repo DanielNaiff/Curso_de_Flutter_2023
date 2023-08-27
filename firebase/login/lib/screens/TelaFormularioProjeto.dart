@@ -10,6 +10,7 @@ import 'package:login/models/usuario.dart';
 import 'package:login/models/Projeto.dart';
 import 'package:flutter/cupertino.dart';
 
+// ignore: must_be_immutable
 class TelaFormularioProjeto extends StatefulWidget {
   final Usuario usuario;
   final String uid;
@@ -35,6 +36,24 @@ class _TelaFormularioProjetoState extends State<TelaFormularioProjeto> {
   final TextEditingController _numeroMenbros = TextEditingController();
   DateTime _dataEntrega = DateTime.now();
   bool _concluido = false;
+// função
+  FuncaoTrocaGerente(context, uid, usuario, idAtual, novoProjeto, novoGerente) {
+    return () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TelaUsuario(
+            uid: widget.uid,
+            usuario: widget.usuario,
+            idAtual: widget.idAtual,
+            novoProjeto: widget.novoProjeto,
+            novoGerente: widget.novoGerente,
+          ),
+        ),
+      );
+    };
+  }
+  // função
 
   @override
   Widget build(BuildContext context) {
@@ -66,20 +85,8 @@ class _TelaFormularioProjetoState extends State<TelaFormularioProjeto> {
             CustomButtom(
               text: 'Trocar Gerente',
               color: Colors.blue,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TelaUsuario(
-                      uid: widget.uid,
-                      usuario: widget.usuario,
-                      idAtual: widget.idAtual,
-                      novoProjeto: widget.novoProjeto,
-                      novoGerente: widget.novoGerente,
-                    ),
-                  ),
-                );
-              },
+              onPressed: FuncaoTrocaGerente(context, widget.uid, widget.usuario,
+                  widget.idAtual, widget.novoProjeto, widget.novoGerente),
             ),
           CustomButtom(
             text: 'inserir dados',

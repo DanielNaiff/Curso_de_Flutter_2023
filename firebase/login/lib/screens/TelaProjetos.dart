@@ -81,6 +81,7 @@ class _TelaProjetosState extends State<TelaProjetos> {
 
 class _CorpoSemCadastro extends StatelessWidget {
   final String uid;
+
   const _CorpoSemCadastro({super.key, required this.uid});
 
   @override
@@ -89,14 +90,7 @@ class _CorpoSemCadastro extends StatelessWidget {
       child: CustomButtom(
         text: 'Finalizar cadastro',
         color: Colors.blue,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TelaFormularioUsuario(uid: uid),
-            ),
-          );
-        },
+        onPressed: FuncaoEditarCadastro(context, uid),
       ),
     );
   }
@@ -113,6 +107,26 @@ class _CorpoComCadastro extends StatefulWidget {
 }
 
 class _EstadoCorpoComCadastro extends State<_CorpoComCadastro> {
+  // Funções
+  FuncaoCriarNovoProjeto(context, uid, usuario) {
+    return () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TelaFormularioProjeto(
+            uid: widget.uid,
+            usuario: widget.usuario,
+            idAtual: '',
+            novoProjeto: true,
+            novoGerente: false,
+            idNovoGerente: '',
+          ),
+        ),
+      );
+    };
+  }
+
+  // Funções
   late Stream<List<Projeto>> _streamProjetos;
 
   @override
@@ -142,7 +156,7 @@ class _EstadoCorpoComCadastro extends State<_CorpoComCadastro> {
 
   @override
   Widget build(BuildContext context) {
-    bool _concluido = false;
+    // bool _concluido = false;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -156,14 +170,7 @@ class _EstadoCorpoComCadastro extends State<_CorpoComCadastro> {
           CustomButtom(
             text: 'Editar cadastro',
             color: Colors.blue,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TelaFormularioUsuario(uid: widget.uid),
-                ),
-              );
-            },
+            onPressed: FuncaoEditarCadastro(context, widget.uid),
           ),
           CustomButtom(
             text: 'Remover dados',
@@ -180,21 +187,8 @@ class _EstadoCorpoComCadastro extends State<_CorpoComCadastro> {
             CustomButtom(
               text: 'Criar novo projeto',
               color: Colors.blue,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TelaFormularioProjeto(
-                      uid: widget.uid,
-                      usuario: widget.usuario,
-                      idAtual: '',
-                      novoProjeto: true,
-                      novoGerente: false,
-                      idNovoGerente: '',
-                    ),
-                  ),
-                );
-              },
+              onPressed:
+                  FuncaoCriarNovoProjeto(context, widget.uid, widget.usuario),
             ),
           const SizedBox(height: 10),
           Expanded(
@@ -244,12 +238,6 @@ class _EstadoCorpoComCadastro extends State<_CorpoComCadastro> {
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  // CheckboxListTile(
-                                  //   title: const Text('Concluido?'),
-                                  //   value: _concluido,
-                                  //   onChanged: (textoAtivo) => setState(
-                                  //       () => _concluido = textoAtivo as bool),
-                                  // ),
                                   IconButton(
                                     onPressed: () {
                                       Navigator.push(
@@ -287,4 +275,15 @@ class _EstadoCorpoComCadastro extends State<_CorpoComCadastro> {
       ),
     );
   }
+}
+
+FuncaoEditarCadastro(context, uid) {
+  return () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TelaFormularioUsuario(uid: uid),
+      ),
+    );
+  };
 }

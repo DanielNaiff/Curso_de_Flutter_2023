@@ -83,9 +83,9 @@ class _TelaUsuarioState extends State<TelaUsuario> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 widget.novoGerente = true;
-                                Navigator.push(
+                                String? idNovoGerente = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => TelaFormularioProjeto(

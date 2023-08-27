@@ -80,3 +80,32 @@ class _TelaAutenticacao extends State<TelaAutenticacao> {
     );
   }
 }
+
+// FuncaoEntrar(_email, _senha, codigo, e, _erroEmail, _erroSenha) {
+//   return () async {
+//     try {
+//       await FirebaseAuth.instance.signInWithEmailAndPassword(
+//         email: _email.text,
+//         password: _senha.text,
+//       );
+//     } on FirebaseAuthException catch (e) {
+//       setState(() {
+//         String codigo = e.code;
+//         if (codigo == 'invalid-email') {
+//           _erroEmail = 'E-mail inválido';
+//         } else if (codigo == 'User-disabled') {
+//           _erroEmail = 'Usuário desabilitado';
+//         } else if (codigo == 'user-not-found') {
+//           _erroEmail = 'Usuário não encontrado';
+//         } else if (codigo == 'wrong-passwaord') {
+//           _erroSenha = 'senha inválida';
+//         }
+//       });
+//       return;
+//     }
+//     setState(() {
+//       _erroEmail = null;
+//       _erroSenha = null;
+//     });
+//   };
+// }
