@@ -1,7 +1,6 @@
 class Projeto {
   final String id;
   final String idGerente;
-
   final String nome;
   final int numeroMembros;
   final DateTime dataEntrega;

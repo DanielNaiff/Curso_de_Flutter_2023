@@ -4,15 +4,27 @@ import 'package:flutter/material.dart';
 // import 'firebase_options.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:login/screens/TelaProjetos.dart';
+import 'package:login/screens/TelaUsuarios.dart';
 import 'package:login/widgets/CustomWidgets.dart';
 import 'package:login/models/usuario.dart';
 import 'package:login/models/Projeto.dart';
+import 'package:flutter/cupertino.dart';
 
 class TelaFormularioProjeto extends StatefulWidget {
   final Usuario usuario;
   final String uid;
-  const TelaFormularioProjeto(
-      {super.key, required this.uid, required this.usuario});
+  final String idAtual;
+  final bool novoProjeto;
+  bool novoGerente = false;
+  String idNovoGerente;
+  TelaFormularioProjeto(
+      {super.key,
+      required this.uid,
+      required this.usuario,
+      required this.idAtual,
+      required this.novoProjeto,
+      required this.novoGerente,
+      required this.idNovoGerente});
 
   @override
   State<TelaFormularioProjeto> createState() => _TelaFormularioProjetoState();
@@ -21,8 +33,9 @@ class TelaFormularioProjeto extends StatefulWidget {
 class _TelaFormularioProjetoState extends State<TelaFormularioProjeto> {
   final TextEditingController _nome = TextEditingController();
   final TextEditingController _numeroMenbros = TextEditingController();
-  DateTime? _dataEntrega;
+  DateTime _dataEntrega = DateTime.now();
   bool _concluido = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +50,37 @@ class _TelaFormularioProjetoState extends State<TelaFormularioProjeto> {
             onChanged: (textoAtivo) =>
                 setState(() => _concluido = textoAtivo as bool),
           ),
+          const Text('Selecione o prazo de entrega:'),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 200,
+            child: CupertinoDatePicker(
+              mode: CupertinoDatePickerMode.date,
+              initialDateTime: DateTime.now(),
+              onDateTimeChanged: (DateTime newDateTime) {
+                setState(() => _dataEntrega = newDateTime);
+              },
+            ),
+          ),
+          if (widget.novoProjeto == false)
+            CustomButtom(
+              text: 'Trocar Gerente',
+              color: Colors.blue,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TelaUsuario(
+                      uid: widget.uid,
+                      usuario: widget.usuario,
+                      idAtual: widget.idAtual,
+                      novoProjeto: widget.novoProjeto,
+                      novoGerente: widget.novoGerente,
+                    ),
+                  ),
+                );
+              },
+            ),
           CustomButtom(
             text: 'inserir dados',
             color: Colors.blue,
@@ -47,19 +91,40 @@ class _TelaFormularioProjetoState extends State<TelaFormularioProjeto> {
                   builder: (context) => TelaProjetos(uid: widget.uid),
                 ),
               );
-              DatabaseReference referencia =
-                  FirebaseDatabase.instance.ref().child('projetos').push();
+              if (widget.novoProjeto == true) {
+                DatabaseReference referencia =
+                    FirebaseDatabase.instance.ref().child('projetos').push();
 
-              String idUnico = referencia.key!;
-              Projeto projeto = Projeto(
-                id: idUnico,
-                idGerente: widget.usuario.id,
-                nome: _nome.text,
-                numeroMembros: int.parse(_numeroMenbros.text),
-                dataEntrega: DateTime(2023, 9, 25),
-                concluido: false,
-              );
-              await referencia.set(projeto.toJson());
+                String idUnico = referencia.key!;
+                Projeto projeto = Projeto(
+                  id: idUnico,
+                  idGerente: widget.usuario.id,
+                  nome: _nome.text,
+                  numeroMembros: int.parse(_numeroMenbros.text),
+                  dataEntrega: _dataEntrega,
+                  concluido: _concluido,
+                );
+                await referencia.set(projeto.toJson());
+              } else {
+                // String idUnico = referencia.key!;
+                Projeto projeto = Projeto(
+                  id: widget.idAtual,
+                  idGerente: widget.novoGerente
+                      ? widget.idNovoGerente
+                      : widget.usuario.id,
+                  nome: _nome.text,
+                  numeroMembros: int.parse(_numeroMenbros.text),
+                  dataEntrega: _dataEntrega,
+                  concluido: _concluido,
+                );
+
+                DatabaseReference referencia = FirebaseDatabase.instance
+                    .ref()
+                    .child('projetos')
+                    .child(widget.idAtual)
+                    .set(projeto.toJson()) as DatabaseReference;
+                await referencia.set(projeto.toJson());
+              }
             },
           ),
         ],

@@ -29,7 +29,10 @@ class _TelaAutenticacao extends State<TelaAutenticacao> {
             Formulario(
                 erroText: _erroEmail, labelText: 'E-mail', controller: _email),
             Formulario(
-                erroText: _erroSenha, labelText: 'Senha', controller: _senha),
+              erroText: _erroSenha,
+              labelText: 'Senha',
+              controller: _senha,
+            ),
             CustomButtom(
                 text: 'Entrar',
                 color: Colors.blue,

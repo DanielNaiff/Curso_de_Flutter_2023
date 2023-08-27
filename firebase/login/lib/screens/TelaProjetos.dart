@@ -142,6 +142,7 @@ class _EstadoCorpoComCadastro extends State<_CorpoComCadastro> {
 
   @override
   Widget build(BuildContext context) {
+    bool _concluido = false;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -184,7 +185,13 @@ class _EstadoCorpoComCadastro extends State<_CorpoComCadastro> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => TelaFormularioProjeto(
-                        uid: widget.uid, usuario: widget.usuario),
+                      uid: widget.uid,
+                      usuario: widget.usuario,
+                      idAtual: '',
+                      novoProjeto: true,
+                      novoGerente: false,
+                      idNovoGerente: '',
+                    ),
                   ),
                 );
               },
@@ -198,24 +205,81 @@ class _EstadoCorpoComCadastro extends State<_CorpoComCadastro> {
                   return const LinearProgressIndicator();
                 }
                 List<Projeto> projetos = snapshot.data!;
-                return ListView.builder(
-                  itemCount: projetos.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(projetos[index].nome),
-                      // subtitle: Text(projetos[index].numeroMembros.toString()),
-                      trailing: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.remove,
-                                color: Colors.blueAccent),
-                          ),
-                        ],
+                double contador = 0;
+                if (projetos.isNotEmpty) {
+                  for (int i = 0; i < projetos.length; i++) {
+                    if (projetos[i].concluido == true) {
+                      contador += 1;
+                    }
+                  }
+                }
+                if (projetos.isNotEmpty) {
+                  return Column(
+                    children: [
+                      const Text('Porcentagem de conclusão dos projetos:',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 10),
+                      PercenteIndicator(
+                          contador: contador, length: projetos.length),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: projetos.length,
+                          itemBuilder: (context, index) {
+                            int compare = (projetos[index]
+                                .dataEntrega
+                                .compareTo(DateTime.now()));
+                            Color vermelho = Colors.red;
+                            Color cor = Colors.blue;
+                            if (compare == -1 &&
+                                projetos[index].concluido == false) {
+                              cor = vermelho;
+                            }
+                            return ListTile(
+                              title: Text(
+                                projetos[index].nome,
+                                style: TextStyle(color: cor),
+                              ),
+                              subtitle: Text(
+                                  projetos[index].numeroMembros.toString()),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // CheckboxListTile(
+                                  //   title: const Text('Concluido?'),
+                                  //   value: _concluido,
+                                  //   onChanged: (textoAtivo) => setState(
+                                  //       () => _concluido = textoAtivo as bool),
+                                  // ),
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              TelaFormularioProjeto(
+                                            uid: widget.uid,
+                                            usuario: widget.usuario,
+                                            idAtual: projetos[index].id,
+                                            novoProjeto: false,
+                                            novoGerente: false,
+                                            idNovoGerente: '',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.edit,
+                                        color: Colors.blueAccent),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    );
-                  },
-                );
+                    ],
+                  );
+                }
+                return Container();
               },
             ),
           ),

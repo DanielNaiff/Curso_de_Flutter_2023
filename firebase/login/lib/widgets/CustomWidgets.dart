@@ -1,16 +1,17 @@
 // ignore_for_file: must_be_immutable
-
+import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter/material.dart';
 
 class Formulario extends StatefulWidget {
   String? erroText;
   String labelText;
   TextEditingController controller;
-  Formulario(
-      {super.key,
-      this.erroText,
-      required this.labelText,
-      required this.controller});
+  Formulario({
+    super.key,
+    this.erroText,
+    required this.labelText,
+    required this.controller,
+  });
 
   @override
   State<Formulario> createState() => _FormularioState();
@@ -56,6 +57,29 @@ class CustomButtom extends StatelessWidget {
         onPressed: onPressed,
         child: Text(text, style: const TextStyle(color: Colors.white)),
       ),
+    );
+  }
+}
+
+class PercenteIndicator extends StatefulWidget {
+  final double contador;
+  final int length;
+  const PercenteIndicator(
+      {super.key, required this.contador, required this.length});
+
+  @override
+  State<PercenteIndicator> createState() => _PercenteIndicatorState();
+}
+
+class _PercenteIndicatorState extends State<PercenteIndicator> {
+  @override
+  Widget build(BuildContext context) {
+    return CircularPercentIndicator(
+      radius: 30.0,
+      lineWidth: 5.0,
+      percent: widget.contador / widget.length,
+      center: Text("${((widget.contador / widget.length) * 100).round()}%"),
+      progressColor: Colors.blue,
     );
   }
 }
