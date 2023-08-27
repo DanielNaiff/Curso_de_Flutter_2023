@@ -49,20 +49,22 @@ class _TelaProjetosState extends State<TelaProjetos> {
         children: [
           const Text('Apenas usuários autenticados podem ver esta tela.'),
           Text(widget.uid),
-          StreamBuilder<Usuario?>(
-            stream: _streamUsuario,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              var dados = snapshot.data;
-              final Usuario? usuario = snapshot.data;
-              if (dados == null) {
-                return _CorpoSemCadastro(uid: widget.uid);
-              } else {
-                return _CorpoComCadastro(usuario: usuario!, uid: widget.uid);
-              }
-            },
+          Expanded(
+            child: StreamBuilder<Usuario?>(
+              stream: _streamUsuario,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                var dados = snapshot.data;
+                final Usuario? usuario = snapshot.data;
+                if (dados == null) {
+                  return _CorpoSemCadastro(uid: widget.uid);
+                } else {
+                  return _CorpoComCadastro(usuario: usuario!, uid: widget.uid);
+                }
+              },
+            ),
           ),
           CustomButtom(
             text: 'sair',
@@ -188,41 +190,35 @@ class _EstadoCorpoComCadastro extends State<_CorpoComCadastro> {
               },
             ),
           const SizedBox(height: 10),
-          Expanded(
-            child: StreamBuilder<List<Projeto>>(
-              stream: _streamProjetos,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const LinearProgressIndicator();
-                }
-                List<Projeto> projetos = snapshot.data!;
-                return ListView.builder(
-                  itemCount: projetos.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      height: 30,
-                      width: 30,
-                      child: ListTile(
+          SafeArea(
+            child: Center(
+              child: StreamBuilder<List<Projeto>>(
+                stream: _streamProjetos,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const LinearProgressIndicator();
+                  }
+                  List<Projeto> projetos = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: projetos.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
                         title: Text(projetos[index].nome),
-                        subtitle:
-                            Text(projetos[index].numeroMembros.toString()),
+                        // subtitle: Text(projetos[index].numeroMembros.toString()),
                         trailing: Row(
                           children: [
-                            SizedBox(
-                              width: 30,
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.remove,
-                                    color: Colors.blueAccent),
-                              ),
+                            IconButton(
+                              onPressed: () {},
+                              icon: const Icon(Icons.remove,
+                                  color: Colors.blueAccent),
                             ),
                           ],
                         ),
-                      ),
-                    );
-                  },
-                );
-              },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ),
         ],
