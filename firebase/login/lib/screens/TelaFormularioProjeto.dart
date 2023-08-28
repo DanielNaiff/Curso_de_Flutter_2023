@@ -36,10 +36,11 @@ class _TelaFormularioProjetoState extends State<TelaFormularioProjeto> {
   final TextEditingController _numeroMenbros = TextEditingController();
   DateTime _dataEntrega = DateTime.now();
   bool _concluido = false;
+  DadosFormularioProjeto? _dados = null;
 // função
   FuncaoTrocaGerente(context, uid, usuario, idAtual, novoProjeto, novoGerente) {
-    return () {
-      Navigator.push(
+    return () async {
+      DadosFormularioProjeto? dados = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => TelaUsuario(
@@ -51,6 +52,10 @@ class _TelaFormularioProjetoState extends State<TelaFormularioProjeto> {
           ),
         ),
       );
+      setState(() {
+        _dados = dados;
+      });
+      
     };
   }
   // função
@@ -116,8 +121,8 @@ class _TelaFormularioProjetoState extends State<TelaFormularioProjeto> {
                 // String idUnico = referencia.key!;
                 Projeto projeto = Projeto(
                   id: widget.idAtual,
-                  idGerente: widget.novoGerente
-                      ? widget.idNovoGerente
+                  idGerente: _dados!.novoGerente
+                      ? _dados!.idNovoGerente
                       : widget.usuario.id,
                   nome: _nome.text,
                   numeroMembros: int.parse(_numeroMenbros.text),
@@ -139,3 +144,4 @@ class _TelaFormularioProjetoState extends State<TelaFormularioProjeto> {
     );
   }
 }
+
