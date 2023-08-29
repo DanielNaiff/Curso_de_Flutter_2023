@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:login/screens/TelaFormularioProjeto.dart';
 import 'package:login/models/usuario.dart';
 
+
 // ignore: must_be_immutable
 class TelaUsuario extends StatefulWidget {
   final Usuario usuario;
@@ -83,22 +84,20 @@ class _TelaUsuarioState extends State<TelaUsuario> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              onPressed: () async {
+                              onPressed: () {
                                 widget.novoGerente = true;
-                                String? idNovoGerente = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TelaFormularioProjeto(
+                                Navigator.pop(
+                                  context,DadosFormularioProjeto(
                                       // novoGerente: widget.novoGerente,
                                       uid: widget.uid,
                                       usuario: widget.usuario,
                                       idAtual: widget.idAtual,
                                       novoProjeto: widget.novoProjeto,
-                                      novoGerente: widget.novoGerente,
+                                      novoGerente: true,
                                       idNovoGerente: usuario[index].id,
                                       // idNovoGerente: usuario[index].id),
                                     ),
-                                  ),
+                                  
                                 );
                               },
                               icon: const Icon(Icons.add_box,
@@ -117,4 +116,21 @@ class _TelaUsuarioState extends State<TelaUsuario> {
       ),
     );
   }
+}
+
+class DadosFormularioProjeto{
+ final Usuario usuario;
+  final String uid;
+  final String idAtual;
+  final bool novoProjeto;
+  bool novoGerente = false;
+  String idNovoGerente;
+  DadosFormularioProjeto(
+      {
+      required this.uid,
+      required this.usuario,
+      required this.idAtual,
+      required this.novoProjeto,
+      required this.novoGerente,
+      required this.idNovoGerente});
 }
