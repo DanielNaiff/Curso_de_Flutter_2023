@@ -1,0 +1,119 @@
+# nesse programa o principal erro que afeta a legibilidade é a quantidade excessiva de informações desnecessárias
+
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:_/constants.dart';
+import 'package:_/di/saving.dart';
+import 'package:_/recording/record_metadata.dart';
+import 'package:_/ui/record/main.dart';
+import 'package:_/ui/records/record_card.dart';
+import 'package:_/ui/records/utils.dart';
+import 'package:_/utils/utils.dart';
+import 'package:_/widgets/list_view.dart';
+import 'package:_/widgets/progress_indicator.dart';
+import 'package:path/path.dart';
+
+class RecordsScreen extends StatefulWidget {
+  @override
+  _RecordsScreenState createState() => _RecordsScreenState();
+}
+
+class _RecordsScreenState extends State<RecordsScreen>
+    implements RecordListener {
+  String _searchString = "";
+
+  Future<List<RecordMetadata>> _init() async {
+    final Directory parent = await SaveDirectory().getRecords();
+    final Directory root = Directory(join(parent.path, Paths.RECORDS_FOLDER));
+
+    final List<RecordMetadata> records = [];
+    final List<FileSystemEntity> files = await root.list().toList();
+    await Future.forEach(files, (entity) async {
+      final RecordMetadata record = await RecordMetadata.from(entity);
+      if (record != null && record.name.startsWith(_searchString))
+        records.add(record);
+    });
+    records.sort((r0, r1) => r1.lastModified.compareTo(r0.lastModified));
+    return records;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: Text("Registros anteriores")),
+        body: Column(
+          children: [
+            # //////textFormField com informações excessivas. o Problemas poderia ser resolvido colocando em uma classe
+            # com as variáveis "Pesquisar" e _searchString em evidência
+            TextFormField(
+              style: TextStyle(fontSize: 16, color: Colors.black),
+              decoration: InputDecoration(
+                filled: true,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                contentPadding: EdgeInsets.all(20),
+                hintText: "Pesquisar",
+                fillColor: Colors.white,
+                prefixIcon: Icon(Icons.search),
+                # ///////////////////////////////////////////////
+              ),
+              onChanged: (text) => setState(() => _searchString = text),
+            ),
+            Expanded(
+              child: FutureBuilder<List<RecordMetadata>>(
+                future: _init(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting)
+                    return Center(child: AppProgressIndicator());
+
+                  final List<RecordMetadata> records = snapshot.data ?? [];
+                  if (records.isEmpty)
+                    # //////////////Esse conjunto de widgets poderia ser unida em uma classe, deixando em evidência apenas as variáveis
+                    # Image.asset e "Sem registros", dessa forma seria possível entender melhor
+                    return Center(
+                        child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Image.asset(
+                          "assets/images/logo.png",
+                          scale: 1.3,
+                          color: Color.alphaBlend(
+                              Color(0x33000000), Theme.of(context).accentColor),
+                        ),
+                        Text(
+                          "Sem registros",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color.alphaBlend(Color(0x33000000),
+                                Theme
+                                    .of(context)
+                                    .accentColor),
+                          ),
+                        ),
+                      ],
+                        ));
+                  # //////////////////////////////////////////////////////////////////////
+
+                  return ListViewBuilder(records
+                      .map((record) => RecordCard(record, listener: this))
+                      .toList());
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void onRecordDeleted() => setState(() {});
+
+  @override
+  void onRecordSelected(BuildContext context, RecordMetadata record) =>
+      context.push(RecordScreen(record));
+}
