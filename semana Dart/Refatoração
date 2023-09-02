@@ -1,0 +1,406 @@
+# Existem 3 principais problemas que afetam a legibiliade do código
+# 1: Widgets longos
+# 2: operadores ternários com grandes retornos
+# 3: Funções longas
+
+import 'package:cade_meu_onibus/services/socket.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map/plugin_api.dart';
+import 'package:get_it/get_it.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:location/location.dart';
+
+import '../../models/bloc.dart';
+import '../../models/models.dart';
+import '../../services/map.dart';
+import '_components/buses_marker_layer.dart';
+import '_components/form_select_busline.dart';
+import '_components/stopbus_marker_layer.dart';
+
+class InitialAppScreen extends StatefulWidget {
+  const InitialAppScreen({super.key});
+
+  @override
+  State<InitialAppScreen> createState() => _InitialAppScreenState();
+}
+
+class _InitialAppScreenState extends State<InitialAppScreen>
+    with TickerProviderStateMixin {
+  // Injeta o singleton do serviço de mapa e localização
+  final _mapService = GetIt.instance.get<MapService>();
+  // Injeta o singleton do gerenciador de estados.
+  final _blocApp = GetIt.instance.get<BlocApp>();
+  // Injeta o singleton do serviço socket.
+  final _firebaseSocketService = GetIt.instance.get<FirebaseSocketService>();
+
+  // Lista de marcadores no mapa.
+  List<Marker> actualPositionMarker = [];
+  // Verdadeiro quando compartilhando a localização
+  bool isServiceLocationActived = false;
+  // Guardar as coordenadas da localização atual
+  late LocationData myLocation;
+
+  // Verdadeiro quando compartilhando a localização
+  bool isSearchingBus = false;
+
+  @override
+  void initState() {
+    initializeMapLocationServices();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // Cancel any ongoing subscriptions or listeners here
+    _mapService.locationSubscription.cancel();
+
+    super.dispose();
+  }
+
+  //
+  // SERVIÇOS DO MAPA E LOCALIZAÇÃO
+  //
+  // Inicia as instancias de serviços
+  void initializeMapLocationServices() async {
+    _mapService.initializer(this);
+    var fisrtLocation = await _mapService.location.getLocation();
+    setState(() {
+      myLocation = fisrtLocation;
+    });
+  }
+
+  // Ativa o compartilhamento da localização atual do usuário
+  activeServiceLocation() async {
+    setState(() {
+      isServiceLocationActived = !isServiceLocationActived;
+    });
+
+    if (isServiceLocationActived) {
+      var fisrtLocation = await _mapService.location.getLocation();
+      setState(() {
+        myLocation = fisrtLocation;
+      });
+
+      _mapService.animatedMapMove(
+          [myLocation.latitude!, myLocation.longitude!], 15270.837 / 900);
+    } else {
+      _blocApp.clean();
+      actualPositionMarker.clear();
+    }
+
+    listeningLocationChange();
+  }
+
+  // Escuta mudança de localização e atualiza a posição do marcador do usuário
+//////////////////////////////////////////////////////////////////////////////////////////////////////// => Função muito longa
+  void listeningLocationChange() async {
+    if (isServiceLocationActived) {
+      _mapService.locationSubscription = GetIt.instance
+          .get<MapService>()
+          .location
+          .onLocationChanged
+          .listen((LocationData currentLocation) async {
+        // Atualiza posição do usuário
+        setState(() {
+          myLocation = currentLocation;
+        });
+
+        updateActualPositionMarker();
+
+        if (_blocApp.busSelected != null) {
+          // Atualiza instância local de ônibus selecionado
+          BusSocket busSocketUpdated = BusSocket(
+              id: _blocApp.busSelected!.id,
+              nameBusline: _blocApp.busSelected!.nameBusline,
+              number: _blocApp.busSelected!.number,
+              actualPosition: [
+                currentLocation.latitude!,
+                currentLocation.longitude!
+              ],
+              updateAt: DateTime.now());
+
+          // Salva no banco a instância atualizada
+          await GetIt.instance
+              .get<Dorm>()
+              .bussocket
+              .repository
+              .push(busSocketUpdated);
+
+          // Atualiza a instância do ônibus no estado
+          GetIt.instance.get<BlocApp>().addBusSelected(busSocketUpdated);
+        }
+      });
+    } else {
+      _mapService.locationSubscription.cancel();
+    }
+  }
+
+  // Atualiza a posição do marcados no mapa
+  // TODO - Débito Técnico
+  void updateActualPositionMarker() {
+    setState(() {
+      actualPositionMarker.clear();
+      actualPositionMarker.add(
+        Marker(
+          point: LatLng(myLocation.latitude!, myLocation.longitude!),
+          builder: (ctx) => Icon(
+            Icons.circle_sharp,
+            size: 20,
+            color: Colors.indigo[900],
+          ),
+        ),
+      );
+    });
+  }
+
+  //
+  // OUTROS COMPONENTES DE TELA
+  //
+  // Componente com botões de ação do usuário
+///////////////////////////////////////////////////////////////////////////////////////////////widgets complexos, devido a grande quantidade junto, poderia componentizar
+  Padding stackUserActionButtons(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Spacer
+            Expanded(flex: 2, child: Container()),
+            Expanded(
+                flex: 1,
+                child: isSearchingBus == true
+                    ? Row(
+                        children: [
+                          const Expanded(
+                              flex: 2,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 4.0),
+                                child: Card(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text(
+                                          "Ônibus mais próxima em 5 minutos",
+                                          style: TextStyle(fontSize: 12)),
+                                    ),
+                                  ),
+                                ),
+                              )),
+                          Expanded(
+                            flex: 1,
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: MaterialButton(
+                                color: Colors.green[800],
+                                onPressed: () async {
+                                  BusSocket bus = await GetIt.instance
+                                      .get<Dorm>()
+                                      .bussocket
+                                      .repository
+                                      .put(
+                                          const BusSocketDependency(),
+                                          BusSocketData(
+                                              nameBusline: GetIt.instance
+                                                  .get<BlocApp>()
+                                                  .buslinesSelected!
+                                                  .name,
+                                              number: "123",
+                                              actualPosition: [
+                                                myLocation.latitude!,
+                                                myLocation.longitude!
+                                              ],
+                                              updateAt: DateTime.now()));
+
+                                  GetIt.instance
+                                      .get<BlocApp>()
+                                      .addBusSelected(bus);
+                                },
+                                child: const Text("Novo ônibus"),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Container()),
+            // Spacer
+            Expanded(flex: 8, child: Container()),
+            Expanded(
+              flex: 1,
+# ////////////////////////////////// operadores ternarios com grandes retornos
+              child: GetIt.instance.get<BlocApp>().busSelected == null
+                  ? MaterialButton(
+                      color: isSearchingBus == true ? Colors.red : Colors.blue,
+# ////////////////////////////////////////////////////////// onPressed muito longo, poderia ser colocado em uma parte separada do código, para uma melhor compreensão
+                      onPressed: () {
+                        if (isSearchingBus == false) {
+                          // Escuta lista de ônibus da busline selecionada
+                          _firebaseSocketService.listeningBusesChange(
+                              _blocApp.buslinesSelected!.name);
+                          setState(() {
+                            isSearchingBus = true;
+                          });
+                        } else {
+                          _firebaseSocketService.busesSubscription.cancel();
+                          _blocApp.removeBuses();
+                          setState(() {
+                            isSearchingBus = false;
+                          });
+                        }
+                      },
+                      child: Text(
+                        isSearchingBus ? "CANCELAR" : "BUSCAR ÔNIBUS",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                  : MaterialButton(
+                      color: Colors.yellow,
+                      onPressed: () {
+                        GetIt.instance.get<BlocApp>().clean();
+                        _firebaseSocketService.busesSubscription.cancel();
+                        setState(() {
+                          isSearchingBus = false;
+                        });
+                      },
+                      child: const Text("Descer do ônibus"),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Cadê meu ônibus?"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+              },
+              icon: const Icon(Icons.logout)),
+        ],
+      ),
+# /////////////////////////////////// operadores ternarios com grandes retornos
+      body: isServiceLocationActived == false
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.location_off,
+                    size: 100,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'É necessário ativar o serviço de localização para continuar',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      activeServiceLocation();
+                    },
+                    child: const Text('Ativar Localização'),
+                  ),
+                ],
+              ),
+            )
+          : Stack(
+# /////////////////////widgets complexos, devido a grande quantidade junto, poderia componentizar
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Expanded(
+                      flex: 2,
+                      child: SelectBusLineDropdownButton(),
+                    ),
+                    Expanded(
+                      flex: 10,
+                      child: FlutterMap(
+                        mapController: _mapService.mapController,
+                        options: MapOptions(
+                          zoom: 12.5,
+                          center: _mapService.centerCity,
+                          interactiveFlags:
+                              InteractiveFlag.pinchZoom | InteractiveFlag.drag,
+                          onMapReady: () {},
+                        ),
+                        nonRotatedChildren: [
+                          AttributionWidget.defaultWidget(
+                            source: 'OpenStreetMap contributors',
+                            sourceTextStyle:
+                                const TextStyle(color: Colors.black),
+                            onSourceTapped: null,
+                          ),
+                        ],
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'com.example.app',
+                          ),
+                          if (_blocApp.buslinesSelected != null)
+                            PolylineLayer(polylineCulling: false, polylines: [
+                              Polyline(
+                                points: GetIt.instance
+                                    .get<BlocApp>()
+                                    .buslinesSelected!
+                                    .route
+                                    .map((coord) =>
+                                        LatLng(coord.first, coord.last))
+                                    .toList(),
+                                color: Colors.black87,
+                                strokeWidth: 2.5,
+                              ),
+                            ]),
+                          if (isServiceLocationActived == true &&
+                              GetIt.instance.get<BlocApp>().busSelected == null)
+                            // Criar um ponto da posição do usuário no mapa.
+                            MarkerLayer(
+                              markers: actualPositionMarker,
+                            ),
+                          if (_blocApp.buslinesSelected != null)
+                            // ignore: unnecessary_null_comparison
+                            if (_blocApp.buslinesSelected!.busstops != null)
+                              const StopbusMarkerLayer(),
+                          if (GetIt.instance.get<BlocApp>().buses != null)
+                            const BusesMarkerLayer(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                if (_blocApp.busStopSelectedStart != null &&
+                    _blocApp.busStopSelectedEnd != null)
+                  stackUserActionButtons(context),
+              ],
+            ),
+      floatingActionButton: isServiceLocationActived == true
+          ? FloatingActionButton(
+              backgroundColor: Colors.white,
+              onPressed: () async {
+                activeServiceLocation();
+              },
+              child: Icon(
+                Icons.location_searching,
+                color: Colors.indigo[900],
+              ),
+            )
+          : Container(),
+    );
+  }
+}
